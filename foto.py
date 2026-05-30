@@ -37,7 +37,7 @@ SCRIPT_DIR = Path(__file__).parent
 ENV_FILE = SCRIPT_DIR / ".env"
 
 load_dotenv(ENV_FILE)
-
+RCLONE_CMD = os.getenv("RCLONE_CMD", "")
 LOCAL_PATH = os.getenv("LOCAL_PATH", "")
 REMOTE_PATH = os.getenv("REMOTE_PATH", "")
 RCLONE_CONFIG_NAME = os.getenv("RCLONE_CONFIG_NAME", "mysftp")
@@ -61,7 +61,7 @@ def log(msg):
     sys.stdout.flush()
 
 def run_rclone_copy(source, dest, extra_args):
-    cmd = ["rclone", "sync", source, dest, "--skip-links"] + extra_args
+    cmd = [RCLONE_CMD, "sync", source, dest, "--skip-links"] + extra_args
     log(f"Выполняется: {' '.join(cmd)}")
     
     try:
