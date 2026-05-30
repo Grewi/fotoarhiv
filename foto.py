@@ -61,7 +61,7 @@ def log(msg):
     sys.stdout.flush()
 
 def run_rclone_copy(source, dest, extra_args):
-    cmd = ["rclone", "sync", source, dest] + extra_args
+    cmd = ["rclone", "sync", source, dest, "--skip-links"] + extra_args
     log(f"Выполняется: {' '.join(cmd)}")
     
     try:

@@ -18,3 +18,11 @@ down-up - Выгрузить, а затем загрузить
 ```
 python3 ./foto.py up
 ```
+
+Для установки на windows7
+
+git version 2.39.1
+
+```
+python -m pip install -i https://mirrors.aliyun.com/pypi/simple/ python-dotenv
+```
