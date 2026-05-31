@@ -89,7 +89,14 @@ def run_rclone_copy(source, dest, extra_args):
         t_out.join()
         t_err.join()
         
-        return proc.returncode == 0
+        # Возвращаем True даже при ошибке 1 (некритические ошибки)
+        if proc.returncode == 0:
+            return True
+        elif proc.returncode == 1:
+            log("ПРЕДУПРЕЖДЕНИЕ: Некоторые файлы не скопированы, но процесс продолжен")
+            return True
+        else:
+            return False
         
     except Exception as e:
         log(f"Ошибка: {e}")
@@ -103,6 +110,8 @@ conn_args = [
     "--low-level-retries=10",
     "--size-only",
     "--progress",
+    "--skip-links",
+    "--ignore-errors",
     "-v"
 ]
 
