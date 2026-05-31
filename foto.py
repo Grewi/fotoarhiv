@@ -79,12 +79,14 @@ def run_rclone_copy(source, dest, extra_args):
         )
         
         def read_stream(stream, prefix):
-            for line in iter(stream.readline, b''):
+            for line in iter(stream.readline, ''):
                 if line:
                 #     try:
                 #         line = line.decode('utf-8')
                 #     except UnicodeDecodeError:
                 #         line = detect_and_decode(line)
+                    if isinstance(line, bytes):
+                         line = line.decode('utf-8', errors='replace')
                     l = line.decode('utf-8', errors='replace')
                     line_content = l.rstrip('\n\r')  # удаляем переносы строк
                     
