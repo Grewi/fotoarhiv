@@ -60,6 +60,11 @@ def log(msg):
     print(f"[{timestamp}] {msg}")
     sys.stdout.flush()
 
+def detect_and_decode(byte_data):
+    result = chardet.detect(byte_data)
+    encoding = result['encoding'] or 'utf-8'
+    return byte_data.decode(encoding)
+
 def run_rclone_copy(source, dest, extra_args):
     cmd = [RCLONE_CMD, "sync", source, dest] + extra_args
     log(f"Выполняется: {' '.join(cmd)}")
@@ -74,11 +79,21 @@ def run_rclone_copy(source, dest, extra_args):
         )
         
         def read_stream(stream, prefix):
-            sys.stdout.write('\033[s') 
-            for line in iter(stream.readline, ''):
+            for line in iter(stream.readline, b''):
                 if line:
-                    log(f"{prefix}{line.rstrip()}")
-            sys.stdout.write('\033[u')
+                #     try:
+                #         line = line.decode('utf-8')
+                #     except UnicodeDecodeError:
+                #         line = detect_and_decode(line)
+                    l = line.decode('utf-8', errors='replace')
+                    line_content = l.rstrip('\n\r')  # удаляем переносы строк
+                    
+                    if line_content.startswith('*'):
+                        sys.stdout.write('\033[2J\033[H')
+                        sys.stdout.flush()
+                        line_content = line_content[1:] if len(line_content) > 1 else ''
+                    
+                    log(f"{prefix}{line_content}")
             stream.close()
         
         from threading import Thread
