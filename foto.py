@@ -85,17 +85,14 @@ def run_rclone_copy(source, dest, extra_args):
                 #         line = line.decode('utf-8')
                 #     except UnicodeDecodeError:
                 #         line = detect_and_decode(line)
-                    if isinstance(line, bytes):
-                         line = line.decode('utf-8', errors='replace')
-                    l = line.decode('utf-8', errors='replace')
-                    line_content = l.rstrip('\n\r')  # удаляем переносы строк
+                    l = line.rstrip('\n\r')  # просто удаляем переносы строк
                     
-                    if line_content.startswith('*'):
+                    if l.startswith('*'):
                         sys.stdout.write('\033[2J\033[H')
                         sys.stdout.flush()
-                        line_content = line_content[1:] if len(line_content) > 1 else ''
+                        l = l[1:] if len(l) > 1 else ''
                     
-                    log(f"{prefix}{line_content}")
+                    log(f"{prefix}{l}")
             stream.close()
         
         from threading import Thread
