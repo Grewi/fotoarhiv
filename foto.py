@@ -37,7 +37,7 @@ SCRIPT_DIR = Path(__file__).parent
 ENV_FILE = SCRIPT_DIR / ".env"
 
 load_dotenv(ENV_FILE)
-RCLONE_CMD = os.getenv("RCLONE_CMD", "")
+RCLONE_CMD = os.getenv("RCLONE_CMD", "rclone")
 LOCAL_PATH = os.getenv("LOCAL_PATH", "")
 REMOTE_PATH = os.getenv("REMOTE_PATH", "")
 RCLONE_CONFIG_NAME = os.getenv("RCLONE_CONFIG_NAME", "mysftp")
