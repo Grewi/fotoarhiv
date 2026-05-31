@@ -61,7 +61,7 @@ def log(msg):
     sys.stdout.flush()
 
 def run_rclone_copy(source, dest, extra_args):
-    cmd = [RCLONE_CMD, "sync", source, dest, "--skip-links"] + extra_args
+    cmd = [RCLONE_CMD, "sync", source, dest] + extra_args
     log(f"Выполняется: {' '.join(cmd)}")
     
     try:
@@ -76,7 +76,7 @@ def run_rclone_copy(source, dest, extra_args):
         def read_stream(stream, prefix):
             for line in iter(stream.readline, ''):
                 if line:
-                    log(f"{prefix}{line.rstrip()}")
+                    log(f"{prefix}{line.rstrip()}"+"\r")
             stream.close()
         
         from threading import Thread
