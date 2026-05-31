@@ -79,20 +79,19 @@ def run_rclone_copy(source, dest, extra_args):
         )
         
         def read_stream(stream, prefix):
-            for line in iter(stream.readline, ''):
-                if line:
-                #     try:
-                #         line = line.decode('utf-8')
-                #     except UnicodeDecodeError:
-                #         line = detect_and_decode(line)
-                    l = line.rstrip('\n\r')  # просто удаляем переносы строк
+            for line_bytes in iter(stream.readline, b''):
+                if line_bytes:
+                    # Безопасное декодирование с заменой проблемных символов
+                    line = line_bytes.decode('utf-8', errors='replace')
+                    line = line.rstrip('\n\r')
                     
-                    if l.startswith('*'):
-                        sys.stdout.write('\033[2J\033[H')
-                        sys.stdout.flush()
-                        l = l[1:] if len(l) > 1 else ''
+                    # Дополнительная очистка от непечатаемых символов
+                    line = ''.join(char for char in line if char.isprintable() or char in '\t ')
                     
-                    log(f"{prefix}{l}")
+                    if "error" in line.lower() or "failed" in line.lower():
+                        log(f"  [ОШИБКА]{line}")
+                    else:
+                        log(f"{prefix}{line}")
             stream.close()
         
         from threading import Thread
