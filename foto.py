@@ -74,7 +74,7 @@ def run_rclone_copy(source, dest, extra_args):
             cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True,
+            # text=True,
             bufsize=1
         )
         
