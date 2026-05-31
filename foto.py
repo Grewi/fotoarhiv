@@ -76,7 +76,7 @@ def run_rclone_copy(source, dest, extra_args):
         def read_stream(stream, prefix):
             for line in iter(stream.readline, ''):
                 if line:
-                    log(f"{prefix}{line.rstrip()}"+"\r")
+                    log(f"--- {prefix}{line.rstrip()}\r")
             stream.close()
         
         from threading import Thread
