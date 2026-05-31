@@ -60,61 +60,56 @@ def log(msg):
     print(f"[{timestamp}] {msg}")
     sys.stdout.flush()
 
-def detect_and_decode(byte_data):
-    result = chardet.detect(byte_data)
-    encoding = result['encoding'] or 'utf-8'
-    return byte_data.decode(encoding)
-
 def run_rclone_copy(source, dest, extra_args):
     cmd = [RCLONE_CMD, "sync", source, dest] + extra_args
     log(f"Выполняется: {' '.join(cmd)}")
     
-    try:
-        proc = subprocess.Popen(
-            cmd,
-            stderr=subprocess.STDOUT,
-            # text=True,
-            bufsize=0
-        )
-        
-        def read_stream(stream, prefix):
-            for line_bytes in iter(stream.readline, b''):
-                if line_bytes:
-                    # Безопасное декодирование с заменой проблемных символов
-                    line = line_bytes.decode('utf-8', errors='replace')
-                    line = line.rstrip('\n\r')
-                    
-                    # Дополнительная очистка от непечатаемых символов
-                    line = ''.join(char for char in line if char.isprintable() or char in '\t ')
-                    
-                    if "error" in line.lower() or "failed" in line.lower():
-                        log(f"  [ОШИБКА]{line}")
-                    else:
-                        log(f"{prefix}{line}")
-            stream.close()
-        
-        from threading import Thread
-        t_out = Thread(target=read_stream, args=(proc.stdout, "  "))
-        t_err = Thread(target=read_stream, args=(proc.stderr, "  [stderr] "))
-        t_out.start()
-        t_err.start()
-        
-        proc.wait()
-        t_out.join()
-        t_err.join()
-        
-        # Возвращаем True даже при ошибке 1 (некритические ошибки)
-        if proc.returncode == 0:
-            return True
-        elif proc.returncode == 1:
-            log("ПРЕДУПРЕЖДЕНИЕ: Некоторые файлы не скопированы, но процесс продолжен")
-            return True
-        else:
-            return False
-        
-    except Exception as e:
-        log(f"Ошибка: {e}")
+    # try:
+    proc = subprocess.Popen(
+        cmd,
+        stderr=subprocess.STDOUT,
+        # text=True,
+        bufsize=0
+    )
+    
+    def read_stream(stream, prefix):
+        for line_bytes in iter(stream.readline, b''):
+            if line_bytes:
+                # Безопасное декодирование с заменой проблемных символов
+                line = line_bytes.decode('utf-8', errors='replace')
+                line = line.rstrip('\n\r')
+                
+                # Дополнительная очистка от непечатаемых символов
+                line = ''.join(char for char in line if char.isprintable() or char in '\t ')
+                
+                if "error" in line.lower() or "failed" in line.lower():
+                    log(f"  [ОШИБКА]{line}")
+                else:
+                    log(f"{prefix}{line}")
+        stream.close()
+    
+    from threading import Thread
+    t_out = Thread(target=read_stream, args=(proc.stdout, "  "))
+    t_err = Thread(target=read_stream, args=(proc.stderr, "  [stderr] "))
+    t_out.start()
+    t_err.start()
+    
+    proc.wait()
+    t_out.join()
+    t_err.join()
+    
+    # Возвращаем True даже при ошибке 1 (некритические ошибки)
+    if proc.returncode == 0:
+        return True
+    elif proc.returncode == 1:
+        log("ПРЕДУПРЕЖДЕНИЕ: Некоторые файлы не скопированы, но процесс продолжен")
+        return True
+    else:
         return False
+        
+    # except Exception as e:
+    #     log(f"Ошибка: {e}")
+    #     return False
     
 conn_args = [
     "--transfers=1",
