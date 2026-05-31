@@ -72,10 +72,9 @@ def run_rclone_copy(source, dest, extra_args):
     try:
         proc = subprocess.Popen(
             cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             # text=True,
-            bufsize=1
+            bufsize=0
         )
         
         def read_stream(stream, prefix):
